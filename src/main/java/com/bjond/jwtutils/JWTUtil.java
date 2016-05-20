@@ -95,17 +95,17 @@ public class JWTUtil {
 
 
 	/**
-	 * Generates a JWT Token given a set of parameters common to JWT
+	 * Convenience method that generates a JWT Token given a set of parameters common to JWT
 	 * implementations.
 	 *
 	 * @param bjondServerEncryptionKey
 	 *            The Base64 encoded Encyrption key
-	 * @param bjondAdapterSubject
-	 *            The indended Subject of the generated token
-	 * @param bjondAdapterAudience
-	 *            The intended Audience of the generated token
 	 * @param issuer
 	 *            The indended Issuer of the generated token
+	 * @param bjondAdapterAudience
+	 *            The intended Audience of the generated token
+	 * @param bjondAdapterSubject
+	 *            The indended Subject of the generated token
 	 * @param json
 	 *            JSON snippet that will be inserted into the claim under the
 	 *            key 'json'
@@ -118,9 +118,9 @@ public class JWTUtil {
 	 *             issue.
 	 */
     public static String generateJWTToken(final String bjondServerEncryptionKey,
-                                          final String bjondAdapterSubject,
-                                          final String bjondAdapterAudience,
                                           final String issuer,
+                                          final String bjondAdapterAudience,
+                                          final String bjondAdapterSubject,
                                           final String json,
                                           final int expirationTimeMinutesInTheFuture) throws JoseException {
 

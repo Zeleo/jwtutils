@@ -52,6 +52,11 @@ dependencies {
     compile 'org.apache.directory.studio:org.slf4j.log4j12:1.7.2'
     compile 'org.apache.logging.log4j:log4j:2.4.1'
     compile 'org.lable.rfc3881.auditlogger.adapter:slf4j:1.3'
+
+    testCompile 'log4j:log4j:1.2.17'
+    testCompile 'org.apache.directory.studio:org.slf4j.log4j12:1.7.2'
+    testCompile 'org.apache.logging.log4j:log4j:2.4.1'
+    testCompile 'org.lable.rfc3881.auditlogger.adapter:slf4j:1.3'
     
     // http://joel-costigliola.github.io/assertj/
     compile 'org.assertj:assertj-core:3.1.0'
@@ -104,9 +109,18 @@ jar {
         instruction 'Bundle-DocURL', 'http://www.bjondinc.com'
         instruction 'Bundle-Activator', 'com.bjond.demo.SampleActivator'
     }
+
+
     
     // Include all of the dependencies. It explodes each jar file into class files and inserts the class files.
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    doFirst {
+        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    }
+
+    // The jose4j  uses signed jars which will not match our manifest so I remove them.
+    // http://stackoverflow.com/a/14441628/3038736
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'     
+     
 }
 
 
@@ -154,6 +168,6 @@ task war() {
 }
 
 task all() {
-  dependsOn  build, compileTestJava, findbugsMain, findbugsTest
+  dependsOn  build, jar, compileTestJava, findbugsMain, findbugsTest
 }
 
