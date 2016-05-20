@@ -22,3 +22,6 @@ TAGS~
 .project
 **/.gradle
 *~
+/bin/
+build/**
+*.settings

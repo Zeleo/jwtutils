@@ -1,4 +1,4 @@
-/*  Copyright (c) 2015
+/*  Copyright (c) 2016
  *  by Bjönd Health, Inc., Boston, MA
  *
  *  This software is furnished under a license and may be used only in
@@ -14,14 +14,8 @@
 
 package com.bjond.test;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
-
-import java.io.File;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import lombok.val;
 
 /** JUnit Test Suite TestBrigid
  *
@@ -31,8 +25,7 @@ import lombok.val;
  *
  */
 
-public class TestBrigid 
-{
+public class TestJWTUtils {
  
     /////////////////////////////////////////////////////////////////////////
     //                      Unit Tests below this point                    //
