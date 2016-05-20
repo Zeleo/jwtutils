@@ -17,6 +17,8 @@ package com.bjond.jwtutils;
 
 
 import java.security.Key;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,15 +36,15 @@ import org.jose4j.lang.JoseException;
 
 
 /**
- * <p>
- * Utils for the JWT RFC-7519
- * http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#JWS
- * </p>
- *
- *
+ Utilities for the JWT RFC-7519 using Jose4j <br>
+ http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#JWS <br>
+ <br>
+ Makes usage much simpler and consolidates common practice.<br>
+<br>
+<br>
  * <a href="mailto:Stephen.Agneta@bjondinc.com">Steve 'Crash' Agneta</a>
  *
- * @version
+ * @version 1.0
  *
  */
 
@@ -57,15 +59,15 @@ public class JWTUtil {
      * If the token is invalid the InvalidJwtException is tossed.
      *
      *
-	 * @param key
-	 * @param issuer
-	 * @param audience
-	 * @param subject
-	 * @param clockSkewInSeconds
-	 * @param token
-	 * @return
+	 * @param key Valid cypher key for encryption
+	 * @param issuer Corporate Name of the Issuer of this token.
+	 * @param audience The audience of the token. That is whom it is meant for. Usually a corporate name.
+	 * @param subject  The subject of the token. Meaning what you are securing.
+	 * @param clockSkewInSeconds Maximum allowable time skey for validation.
+	 * @param token The actual JWT token.
+	 * @return JwtClaims which will contain your claims map.
 	 *
-	 * @throws InvalidJwtException
+	 * @throws InvalidJwtException Tossed if the token does not pass validation. Expired. Bad Key. Wrong claims. Etcetera.
 	 */
     public static JwtClaims validateTokenAndProcessClaims(final Key key,
                                                           final String issuer,
@@ -90,19 +92,53 @@ public class JWTUtil {
         return jwtConsumer.processToClaims(token);
     }
 
+
+
+	/**
+	 * Generates a JWT Token given a set of parameters common to JWT implementations.
+	 *
+	 * @param bjondServerEncryptionKey The Base64 encoded Encyrption key
+	 * @param bjondAdapterSubject  The indended Subject of the generated token
+	 * @param bjondAdapterAudience The intended Audience of the generated token
+	 * @param issuer The indended Issuer of the generated token
+	 * @param json JSON snippet that will be inserted into the claim under the key 'json'
+	 * @return JWT token string of the form string.string.string
+	 *
+	 * @throws JoseException if any issue occurs during generation. Mostly likely a key issue.
+	 */
+    public static String generateJWTToken(final String bjondServerEncryptionKey,
+                                          final String bjondAdapterSubject,
+                                          final String bjondAdapterAudience,
+                                          final String issuer,
+                                          final String json) throws JoseException {
+
+        final Key key = JWTUtil.generateAESKey(JWTUtil.base64Decode(bjondServerEncryptionKey));
+		final Map<String, List<String>> claimsMap = new HashMap<>();
+
+		claimsMap.put("json", Arrays.asList(json));
+        return JWTUtil.generateJWT_AES128(
+                                          key,
+                                          issuer,
+                                          bjondAdapterAudience,
+                                          bjondAdapterSubject,
+                                          claimsMap,
+                                          1
+                                          );
+	}
+
     
 	/**
 	 * Generates a JWT token using AES_128_CBC_HMAC_SHA_256.
 	 *
-	 * @param key
-	 * @param issuer
-	 * @param audience
-	 * @param subject
-	 * @param claimsMap
-	 * @param expirationTimeMinutesInTheFuture
-	 * @return
+	 * @param key Valid cypher key for encryption
+	 * @param issuer Corporate Name of the Issuer of this token.
+	 * @param audience The audience of the token. That is whom it is meant for. Usually a corporate name.
+	 * @param subject The subject of the token. Meaning what you are securing.
+	 * @param claimsMap The map of claims in JWT speak
+	 * @param expirationTimeMinutesInTheFuture The maximum number of minutes this generated token is valid.
+	 * @return JWT token string of the form string.string.string
 	 *
-	 * @throws JoseException
+	 * @throws JoseException Tossed if there is any failure during generation.
 	 */
     public static String generateJWT_AES128(final Key key,
                                             final String issuer,
@@ -137,8 +173,8 @@ public class JWTUtil {
 	 * Given a properly constructed AES key as an array of bytes,
      * geneates the corresponding JCE key.
 	 *
-	 * @param key
-	 * @return
+	 * @param key Actual byte array of the AES 128 key.
+	 * @return Jose4j key suitable for encryption
 	 */
     public static Key generateAESKey(final byte[] key) {
         return new AesKey(key);
@@ -147,9 +183,9 @@ public class JWTUtil {
     
 	/**
 	 * Generates an AES 128 key using a cryptographically 
-     * secure randome number generator.
+     * secure random number generator.
 	 *
-	 * @return
+	 * @return byte array of AES 128 key.
 	 */
     public static byte[] generateRandomKey_AES128() {
         return ByteUtil.randomBytes(16);
@@ -159,8 +195,8 @@ public class JWTUtil {
 	 * Convenience method that generates a corresponding Base64
      * encoding if any arbitrary byte array.
 	 *
-	 * @param key
-	 * @return
+	 * @param key byte array of an encryption key
+	 * @return encoding of byte array suitable for over the wire transmission
 	 */
     public static String base64Encode(final byte[] key) {
         return Base64.encode(key);
@@ -170,8 +206,8 @@ public class JWTUtil {
 	 * Convenience method that decodes a Base64 string
      * into the corresponding byte array.
 	 *
-	 * @param key
-	 * @return
+	 * @param key base64 encryption key.
+	 * @return the byte array decoded from the base64.
 	 */
     public static byte[] base64Decode(final String key) {
         return Base64.decode(key);
