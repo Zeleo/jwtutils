@@ -1,0 +1,142 @@
+/*  Copyright (c) 2015
+ *  by Bjond, Inc., Boston, MA
+ *
+ *  This software is furnished under a license and may be used only in
+ *  accordance with the terms of such license.  This software may not be
+ *  provided or otherwise made available to any other party.  No title to
+ *  nor ownership of the software is hereby transferred.
+ *
+ *  This software is the intellectual property of Bjond, Inc.,
+ *  and is protected by the copyright laws of the United States of America.
+ *  All rights reserved internationally.
+ *
+ */
+
+
+apply plugin: 'findbugs'
+apply plugin: 'eclipse'
+apply plugin: 'groovy'
+apply plugin: 'osgi'
+apply plugin: 'java'
+
+// For the entire project
+repositories {
+    maven {url 'http://nexus.bjondhealth.com/nexus/content/groups/public'}
+    maven {url 'http://nexus.bjondhealth.com/nexus/content/groups/private'}
+}
+
+
+
+defaultTasks 'assemble', 'jar'
+
+
+configurations {
+    testManagedCompile { extendsFrom testCompile }
+    testManagedRuntime { extendsFrom testRuntime }
+}
+
+dependencies {
+    // Critial JSON Web Token RFC-7519 Implementation from Ping Identity.
+    // https://bitbucket.org/b_c/jose4j/wiki/Home
+    compile 'org.bitbucket.b_c:jose4j:0.5.1'
+    testCompile 'org.bitbucket.b_c:jose4j:0.5.1'
+
+    // Cryptography
+    compile 'org.bouncycastle:bcprov-jdk15on:1.54'
+    compile 'org.bouncycastle:bcprov-ext-jdk15on:1.54'
+    compile 'org.apache.directory.studio:org.apache.commons.codec:1.8'
+
+    compile 'junit:junit:4.12'
+
+    compile 'org.apache.directory.studio:org.slf4j.log4j12:1.7.2'
+    compile 'org.apache.logging.log4j:log4j:2.4.1'
+    compile 'org.lable.rfc3881.auditlogger.adapter:slf4j:1.3'
+    
+    // http://joel-costigliola.github.io/assertj/
+    compile 'org.assertj:assertj-core:3.1.0'
+
+    // Lombok
+    compile 'org.projectlombok:lombok:1.16.6'
+
+    // Functional Java. I can't wait for JDK 8 to really use this stuff 
+    // the way the functional Gods intended.
+    compile 'org.functionaljava:functionaljava-java8:4.4'
+
+    // Apache Commons 
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.apache.commons:commons-math3:3.4.1'
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
+    compile 'commons-beanutils:commons-beanutils:1.9.2'
+    compile 'commons-dbutils:commons-dbutils:1.6'
+
+    // CSV library for export/import of various CSV file formats:
+    // MSExcel and RFC 4180 for example.
+    compile 'org.apache.commons:commons-csv:1.1'
+    compile 'org.apache.commons:commons-collections4:4.0'
+
+    // Findbugs
+    compile 'com.google.code.findbugs:findbugs:3.0.1'
+    compile 'com.google.code.findbugs:jsr305:3.0.0'
+    compile 'com.google.code.findbugs:annotations:3.0.0'
+    
+}
+
+// I want to see all deprecations.
+// Set the proper encoding for Java compiler. Usually this isn't needed, but it is in the 
+// OpenShift environment.
+// Change Compile to JavaCompile when moving to Gradle 2.X
+tasks.withType(JavaCompile) { 
+    options.compilerArgs << "-Xlint:all" 
+    options.compilerArgs << "-Xlint:-processing"
+    options.compilerArgs << "-Xdiags:verbose" 
+    options.encoding = 'UTF-8'
+} 
+
+jar {
+    archiveName = 'brigid.jar'
+    manifest {
+        name = 'server-core-api'
+        instruction 'Class-Path', '.'
+        instruction 'Main-Class', 'com.bjond.Main'
+        instruction 'Private-Package', 'com.bjond'
+        instruction 'Bundle-Vendor', 'Bjönd, Inc'
+        instruction 'Bundle-Description', 'Bjönd Health Server Core Functionality plus Interfaces'
+        instruction 'Bundle-DocURL', 'http://www.bjondinc.com'
+        instruction 'Bundle-Activator', 'com.bjond.demo.SampleActivator'
+    }
+    
+    // Include all of the dependencies. It explodes each jar file into class files and inserts the class files.
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// The html report can be found under /bjond-health/clients/server-core/build/reports/findbugs     //
+// If you want an XML report that can be fed into the findbugs eclipse plugin set xml.enabled = true //
+// and html.enabled = false. You can't have both true at the same time which is kinda stupid but     //
+// there ya go.                                                                                      //
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+tasks.withType(FindBugs) {
+  reports {
+      xml.enabled = false
+      html.enabled = true
+  }
+}
+
+
+
+// Does nothing. Compatability with my emacs macros
+task deployroot (type: Copy){
+
+}
+
+// Dummy task
+task war() {
+  dependsOn jar
+}
+
+task all() {
+  dependsOn  build, compileTestJava, findbugsMain, findbugsTest
+}
+
