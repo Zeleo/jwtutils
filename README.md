@@ -16,6 +16,15 @@ Build jar file within ./build/libs/jwtutil.jar
 $ gradle all
 ```
 
+## Publish Maven locally for testing
+
+This will generate the default Maven POM file within ./build/publications/maven/pom-default.xml
+
+```shell
+$ gradle publishToMavenLocal
+```
+
+
 
 ## Documentation
 

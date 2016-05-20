@@ -126,6 +126,23 @@ tasks.withType(FindBugs) {
 
 
 
+/////////////////////////////////////////////////////////////////////////
+//                           Maven publication                         //
+/////////////////////////////////////////////////////////////////////////
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'org.bjond.jwtutils'
+            artifactId 'jwtutils'
+            version '1.0'
+
+            from components.java
+        }
+    }
+}
+
+
+
 // Does nothing. Compatability with my emacs macros
 task deployroot (type: Copy){
 
