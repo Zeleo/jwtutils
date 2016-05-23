@@ -15,8 +15,6 @@
 package com.bjond.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
-
 import java.security.Key;
 import java.util.Arrays;
 import java.util.List;
