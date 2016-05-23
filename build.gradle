@@ -114,7 +114,7 @@ jar {
     
     // Include all of the dependencies. It explodes each jar file into class files and inserts the class files.
     doFirst {
-        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+        //        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     }
 
     // The jose4j  uses signed jars which will not match our manifest so I remove them.
