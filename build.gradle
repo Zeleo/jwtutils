@@ -159,3 +159,11 @@ task all() {
   dependsOn  build, jar, compileTestJava, findbugsMain, findbugsTest
 }
 
+publishToMavenLocal {
+    doLast {
+        final File file = new File('build/publications/maven/pom-default.xml');
+        file.renameTo('build/publications/maven/jwtutilx.pom')
+    }
+
+}
+
