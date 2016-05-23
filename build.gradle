@@ -162,7 +162,7 @@ task all() {
 publishToMavenLocal {
     doLast {
         final File file = new File('build/publications/maven/pom-default.xml');
-        file.renameTo('build/publications/maven/jwtutilx.pom')
+        file.renameTo('build/publications/maven/jwtutil.pom')
     }
 
 }
