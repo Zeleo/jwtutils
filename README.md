@@ -27,7 +27,7 @@ $ gradle test
 
 ## Publish Maven locally for testing
 
-This will generate the default Maven POM file within ./build/publications/maven/pom-default.xml
+This will generate the default Maven POM file within ./build/publications/maven/jwtutil.pom
 
 ```shell
 $ gradle publishToMavenLocal
