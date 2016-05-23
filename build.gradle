@@ -109,18 +109,6 @@ jar {
         instruction 'Bundle-DocURL', 'http://www.bjondinc.com'
         instruction 'Bundle-Activator', 'com.bjond.demo.SampleActivator'
     }
-
-
-    
-    // Include all of the dependencies. It explodes each jar file into class files and inserts the class files.
-    doFirst {
-        //        from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    }
-
-    // The jose4j  uses signed jars which will not match our manifest so I remove them.
-    // http://stackoverflow.com/a/14441628/3038736
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'     
-     
 }
 
 
