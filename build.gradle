@@ -62,7 +62,7 @@ dependencies {
     compile 'org.assertj:assertj-core:3.1.0'
 
     // Lombok
-    compile 'org.projectlombok:lombok:1.16.6'
+    compile 'org.projectlombok:lombok:1.16.8'
 
     // Functional Java. I can't wait for JDK 8 to really use this stuff 
     // the way the functional Gods intended.
